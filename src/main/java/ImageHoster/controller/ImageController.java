@@ -27,6 +27,8 @@ public class ImageController {
     @Autowired
     private TagService tagService;
 
+    private String error = "Only the owner of the image can edit the image";
+
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
     public String getUserImages(Model model) {
@@ -107,7 +109,7 @@ public class ImageController {
         if(loggedInUser.getId() == imageUser.getId()) {
             return "images/edit";
         } else {
-            model.addAttribute("editError",true);
+            model.addAttribute("editError",error);
             return "images/image";
         }
     }
