@@ -1,11 +1,12 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
-import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,9 @@ public class ImageController {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private CommentService commentService;
 
     private String editErrorMessage = "Only the owner of the image can edit the image";
     private String deleteErrorMessage = "Only the owner of the image can delete the image";
@@ -54,6 +58,8 @@ public class ImageController {
         Image image = imageService.getImage(ImageId);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        model.addAttribute("comments", image.getComments());
+        model.addAttribute("comment", new Comment());
         return "images/image";
     }
 
@@ -103,14 +109,17 @@ public class ImageController {
 
         User loggedInUser = (User) session.getAttribute("loggeduser");
 
-        //String tags = convertTagsToString(image.getTags());
+        String tags = convertTagsToString(image.getTags());
 
-        model.addAttribute("tags", image.getTags());
         model.addAttribute("image", image);
+        model.addAttribute("comments", image.getComments());
+        model.addAttribute("comment", new Comment());
 
         if(loggedInUser.getId() == imageUser.getId()) {
+            model.addAttribute("tags", tags);
             return "images/edit";
         } else {
+            model.addAttribute("tags", image.getTags());
             model.addAttribute("editError",editErrorMessage);
             return "images/image";
         }
@@ -167,10 +176,31 @@ public class ImageController {
         } else {
             model.addAttribute("tags", image.getTags());
             model.addAttribute("image", image);
+            model.addAttribute("comments", image.getComments());
+            model.addAttribute("comment", new Comment());
             model.addAttribute("deleteError",deleteErrorMessage);
             return "images/image";
         }
 
+    }
+
+
+    @RequestMapping(value = "/images/{id}/{title}/comments", method = RequestMethod.POST)
+    public String commentImageSubmit(@PathVariable("id") Integer imageId, @PathVariable("title") String title, Comment comment, HttpSession session) throws IOException {
+
+        Image image = imageService.getImage(imageId);
+        comment.setImage(image);
+
+        User user = (User) session.getAttribute("loggeduser");
+        comment.setUser(user);
+
+        comment.setDate(new Date());
+
+        image.getComments().add(comment);
+
+        commentService.createComment(comment);
+
+        return "redirect:/images/" + image.getId() + "/" + image.getTitle();
     }
 
 
