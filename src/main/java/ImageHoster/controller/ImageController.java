@@ -183,27 +183,7 @@ public class ImageController {
         }
 
     }
-
-
-    @RequestMapping(value = "/images/{id}/{title}/comments", method = RequestMethod.POST)
-    public String commentImageSubmit(@PathVariable("id") Integer imageId, @PathVariable("title") String title, Comment comment, HttpSession session) throws IOException {
-
-        Image image = imageService.getImage(imageId);
-        comment.setImage(image);
-
-        User user = (User) session.getAttribute("loggeduser");
-        comment.setUser(user);
-
-        comment.setDate(new Date());
-
-        image.getComments().add(comment);
-
-        commentService.createComment(comment);
-
-        return "redirect:/images/" + image.getId() + "/" + image.getTitle();
-    }
-
-
+    
     //This method converts the image to Base64 format
     private String convertUploadedFileToBase64(MultipartFile file) throws IOException {
         return Base64.getEncoder().encodeToString(file.getBytes());
