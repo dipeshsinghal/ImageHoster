@@ -12,8 +12,12 @@ public class UserService {
     private UserRepository userRepository;
 
     //Call the registerUser() method in the UserRepository class to persist the user record in the database
-    public void registerUser(User newUser) {
+    public boolean registerUser(User newUser) {
+        if(!validatePasswordRules(newUser.getPassword())) {
+            return false;
+        }
         userRepository.registerUser(newUser);
+        return true;
     }
 
     //Since we did not have any user in the database, therefore the user with username 'upgrad' and password 'password' was hard-coded
@@ -30,6 +34,24 @@ public class UserService {
         } else {
             return null;
         }
+    }
+
+    private boolean validatePasswordRules(String password) {
+        boolean containLetter = false;
+        boolean containDigit = false;
+        boolean containSpecialChar = false;
+        for(char letter : password.toCharArray()) {
+            if ( (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z' ) ) {
+                containLetter = true;
+            } else if ( letter >= '0' && letter <= '9') {
+                containDigit = true;
+            } else {
+                containSpecialChar = true;
+            }
+            if( containLetter && containDigit && containSpecialChar )
+                return true;
+        }
+        return false;
     }
 
 }
