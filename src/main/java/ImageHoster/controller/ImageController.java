@@ -249,12 +249,19 @@ public class ImageController {
     private String convertTagsToString(List<Tag> tags) {
         StringBuilder tagString = new StringBuilder();
 
-        for (int i = 0; i <= tags.size() - 2; i++) {
-            tagString.append(tags.get(i).getName()).append(",");
-        }
+        //Fix Unit Test Bug: If tag size is < 2
 
-        Tag lastTag = tags.get(tags.size() - 1);
-        tagString.append(lastTag.getName());
+        if( tags.size() > 1 ) {
+
+            for (int i = 0; i <= tags.size() - 2; i++) {
+                tagString.append(tags.get(i).getName()).append(",");
+            }
+
+            Tag lastTag = tags.get(tags.size() - 1);
+            tagString.append(lastTag.getName());
+        } else if (tags.size() == 1) {
+            tagString.append(tags.get(0).getName());
+        }
 
         return tagString.toString();
     }

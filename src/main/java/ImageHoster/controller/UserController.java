@@ -43,8 +43,7 @@ public class UserController {
     //This method calls the business logic and after the user record is persisted in the database, directs to login page
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
     public String registerUser(User user, Model model) {
-        if(!userService.registerUser(user)){
-
+        if(!validatePasswordRules(user.getPassword())){
             //clear password as user need to enter again.
             user.setPassword(null);
             //add error message to model about password not meeting complexity criteria.
@@ -54,7 +53,9 @@ public class UserController {
             model.addAttribute("User", user);
             return "users/registration";
         } else {
-            return "redirect:/users/login";
+            userService.registerUser(user);
+            model.addAttribute("User", new User());
+            return "users/login";
         }
     }
 
@@ -91,5 +92,32 @@ public class UserController {
         List<Image> images = imageService.getAllImages();
         model.addAttribute("images", images);
         return "index";
+    }
+
+    //Call this function to validate password complexity rule
+    private boolean validatePasswordRules(String password) {
+
+        boolean containLetter = false;
+        boolean containDigit = false;
+        boolean containSpecialChar = false;
+
+        //iterate each character of password String
+        for(char letter : password.toCharArray()) {
+            if ( (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z' ) ) {
+                //if found any alphabet character set containLetter to true
+                containLetter = true;
+            } else if ( letter >= '0' && letter <= '9') {
+                //if found any digit character set containDigit to true
+                containDigit = true;
+            } else {
+                //else set containSpecialChar to true
+                containSpecialChar = true;
+            }
+            if( containLetter && containDigit && containSpecialChar ) {
+                //once all above there are true mean password meet the complexity no further check required return true
+                return true;
+            }
+        }
+        return false;
     }
 }

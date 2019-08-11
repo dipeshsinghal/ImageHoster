@@ -12,16 +12,9 @@ public class UserService {
     private UserRepository userRepository;
 
     //Call the registerUser() method in the UserRepository class to persist the user record in the database
-    public boolean registerUser(User newUser) {
-
-        //validate password complexity rule before allowing to save user registration data to database
-        if(!validatePasswordRules(newUser.getPassword())) {
-            return false;
-        }
-
+    public void registerUser(User newUser) {
         //registration user data to database
         userRepository.registerUser(newUser);
-        return true;
     }
 
     //Since we did not have any user in the database, therefore the user with username 'upgrad' and password 'password' was hard-coded
@@ -38,33 +31,6 @@ public class UserService {
         } else {
             return null;
         }
-    }
-
-    //Call this function to validate password complexity rule
-    private boolean validatePasswordRules(String password) {
-
-        boolean containLetter = false;
-        boolean containDigit = false;
-        boolean containSpecialChar = false;
-
-        //iterate each character of password String
-        for(char letter : password.toCharArray()) {
-            if ( (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z' ) ) {
-                //if found any alphabet character set containLetter to true
-                containLetter = true;
-            } else if ( letter >= '0' && letter <= '9') {
-                //if found any digit character set containDigit to true
-                containDigit = true;
-            } else {
-                //else set containSpecialChar to true
-                containSpecialChar = true;
-            }
-            if( containLetter && containDigit && containSpecialChar ) {
-                //once all above there are true mean password meet the complexity no further check required return true
-                return true;
-            }
-        }
-        return false;
     }
 
 }
