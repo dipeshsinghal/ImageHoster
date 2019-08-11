@@ -27,7 +27,7 @@ public class CommentController {
 
     //This method will add a comment on a images and redirect to same image with updated comment
     // Method will be called from images/image.html with image id and image title as path Variable with new Comment
-    @RequestMapping(value = "/images/{id}/{title}/comments", method = RequestMethod.POST)
+    @RequestMapping(value = "/image/{id}/{title}/comments", method = RequestMethod.POST)
     public String commentImageSubmit(@PathVariable("id") Integer imageId, @PathVariable("title") String title, Comment comment, HttpSession session) throws IOException {
 
         //Get Image Object using imageId for which comment need to add
