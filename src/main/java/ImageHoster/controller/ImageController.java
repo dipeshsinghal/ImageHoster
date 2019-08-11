@@ -56,9 +56,13 @@ public class ImageController {
     @RequestMapping("/images/{id}/{title}")
     public String showImage(@PathVariable("id") Integer ImageId, @PathVariable("title") String title, Model model) {
         Image image = imageService.getImage(ImageId);
+
+        //Add all the object like image, tags, comments in model to process it by view
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
         model.addAttribute("comments", image.getComments());
+
+        //add a empty comment object in model to send to view for new comment
         model.addAttribute("comment", new Comment());
         return "images/image";
     }
@@ -111,15 +115,23 @@ public class ImageController {
 
         String tags = convertTagsToString(image.getTags());
 
+        //Add image  tags, comments in model to process it by view
         model.addAttribute("image", image);
         model.addAttribute("comments", image.getComments());
+
+        //add a empty comment object in model to send to view for new comment
         model.addAttribute("comment", new Comment());
 
         if(loggedInUser.getId() == imageUser.getId()) {
+            //image belong to same user to editing is allowed
+            //Add tags as comma separated string to display in editable text box
             model.addAttribute("tags", tags);
             return "images/edit";
-        } else {
+        } else {//image belong to same user to editing is allowed
+
+            //Add list of tags object to display on image page
             model.addAttribute("tags", image.getTags());
+            //Add error text for edit not allowed
             model.addAttribute("editError",editErrorMessage);
             return "images/image";
         }
@@ -139,23 +151,35 @@ public class ImageController {
     @RequestMapping(value = "/editImage", method = RequestMethod.PUT)
     public String editImageSubmit(@RequestParam("file") MultipartFile file, @RequestParam("imageId") Integer imageId, @RequestParam("tags") String tags, Image updatedImage, HttpSession session) throws IOException {
 
+        //get Image object using image id.
         Image image = imageService.getImage(imageId);
         String updatedImageData = convertUploadedFileToBase64(file);
         List<Tag> imageTags = findOrCreateTags(tags);
 
+        //when image edit page submit user will not upload same image as he don't want to change it
+        //select same image else update the image
         if (updatedImageData.isEmpty())
             updatedImage.setImageFile(image.getImageFile());
         else {
             updatedImage.setImageFile(updatedImageData);
         }
 
+        //some field might nit be send from UI back so make sure they are correctly set else data base operation will fail.
+         //set exiting value of id, user of image
         updatedImage.setId(imageId);
         User user = (User) session.getAttribute("loggeduser");
         updatedImage.setUser(user);
+
+        //set updated value of tags of image
         updatedImage.setTags(imageTags);
+
+        //set current date a posted date  image on update
         updatedImage.setDate(new Date());
 
+        //call image service to update image
         imageService.updateImage(updatedImage);
+
+        //redirect to same image after update to reflect update.
         return "redirect:/images/" + updatedImage.getId() + "/" + updatedImage.getTitle();
     }
 
@@ -166,18 +190,27 @@ public class ImageController {
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
     public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) {
 
+        //get Image object using image id.
         Image image = imageService.getImage(imageId);
         User imageUser = image.getUser();
         User loggedInUser = (User) session.getAttribute("loggeduser");
 
         if(loggedInUser.getId() == imageUser.getId()) {
+            //image belong to same user so delete is allowed
+            //call deleteImage from service
             imageService.deleteImage(imageId);
+            //redirect to user home page
             return "redirect:/images";
         } else {
+            //Add image  tags, comments in model to process it by view when page goes to  image
             model.addAttribute("tags", image.getTags());
             model.addAttribute("image", image);
             model.addAttribute("comments", image.getComments());
+
+            //add a empty comment object in model to send to view for new comment
             model.addAttribute("comment", new Comment());
+
+            //Add error text for delete not allowed
             model.addAttribute("deleteError",deleteErrorMessage);
             return "images/image";
         }

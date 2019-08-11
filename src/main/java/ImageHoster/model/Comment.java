@@ -28,7 +28,7 @@ public class Comment {
     //One comment can have only one user (owner) but one user can have multiple comments
     //FetchType is EAGER
     @ManyToOne(fetch = FetchType.EAGER)
-    //Below annotation indicates that the name of the column in 'comments' table referring the primary key in 'users' table will be 'user'
+    //Below annotation indicates that the name of the column in 'comments' table referring the primary key in 'users' table will be 'user_id'
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -36,7 +36,7 @@ public class Comment {
     //One image can have multiple comments but one comment can only belong to one image
     //FetchType is EAGER
     @ManyToOne(fetch = FetchType.EAGER)
-    //Below annotation indicates that the name of the column in 'comments' table referring the primary key in 'images' table will be 'image'
+    //Below annotation indicates that the name of the column in 'comments' table referring the primary key in 'images' table will be 'image_id'
     @JoinColumn(name = "image_id")
     private Image image;
 

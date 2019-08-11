@@ -11,6 +11,7 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
+    //Call the createComment() method in the Repository to update comment for a image
     public Comment createComment(Comment comment) {
         return commentRepository.createComment(comment);
     }

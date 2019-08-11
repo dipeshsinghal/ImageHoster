@@ -44,8 +44,13 @@ public class UserController {
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
     public String registerUser(User user, Model model) {
         if(!userService.registerUser(user)){
+
+            //clear password as user need to enter again.
             user.setPassword(null);
+            //add error message to model about password not meeting complexity criteria.
             model.addAttribute("passwordTypeError", error);
+
+            //add user object in model, so when registration page open it have pre filled all data which filled by used except password with error message
             model.addAttribute("User", user);
             return "users/registration";
         } else {
